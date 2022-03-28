@@ -1,0 +1,82 @@
+<process name="AMF_BP_MANAGE_ADAPTERS">
+  <sequence name="Main_start">
+    <operation name="AmfService">
+      <participant name="AmfService"/>
+      <output message="AmfServiceInputMessage">
+        <assign to="." from="*"></assign>
+        <assign to="classname">com.mftlabs.sfgservices.bpexec.SfgAdapterManager</assign>
+      </output>
+      <input message="inmsg">
+        <assign to="." from="*"></assign>
+      </input>
+    </operation>
+
+    <operation name="Release Service">
+      <participant name="ReleaseService"/>
+      <output message="ReleaseServiceTypeInputMessage">
+        <assign to="." from="*"></assign>
+        <assign to="TARGET">PrimaryDocument</assign>
+      </output>
+      <input message="inmsg">
+        <assign to="." from="*"></assign>
+      </input>
+    </operation>
+
+    <assign to="." from="DOMToDoc(/ProcessData/Service/Output,&apos;PrimaryDocument&apos;)"></assign>
+			<operation name="Document Keyword Replace">
+		<participant name="DocKeywordReplace"/>
+		<output message="DocKeywordReplaceInputMessage">
+		<assign to="." from="*"></assign>
+		<assign to="literal_mode">true</assign>
+		<assign to="keyword1" from="'&amp;quot;'"></assign>
+		<assign to="replace1" from="string('22')"></assign>
+		<assign to="replacetype1">hex</assign>
+		<assign to="keyword2" from="'&amp;apos;'"></assign>
+		<assign to="replace2" from="string('27')"></assign>
+		<assign to="replacetype2">hex</assign>
+		<assign to="keyword3" from="'&amp;lt;'"></assign>
+		<assign to="replace3" from="string('3C')"></assign>
+		<assign to="replacetype3">hex</assign>
+		<assign to="keyword4" from="'&amp;gt;'"></assign>
+		<assign to="replace4" from="string('3E')"></assign>
+		<assign to="replacetype4">hex</assign>
+		<assign to="keyword5" from="'&amp;amp;'"></assign>
+		<assign to="replace5" from="string('26')"></assign>
+		<assign to="replacetype5">hex</assign>
+		</output>
+		<input message="inmsg">
+		<assign to="." from="*"></assign>
+		</input>
+		</operation>	
+	
+    <operation name="HTTP Respond Service">
+      <participant name="HttpRespond"/>
+      <output message="HttpRespondServiceInputMessage">
+        <assign to="." from="*"></assign>
+        <assign to="doc-has-headers">false</assign>
+        <assign to="status-code">200</assign>
+      </output>
+      <input message="inmsg">
+        <assign to="." from="*"></assign>
+      </input>
+    </operation>
+
+    <onFault>
+      <sequence name="Onfault_start">
+
+        <operation name="HTTP Respond Service">
+          <participant name="HttpRespond"/>
+          <output message="HttpRespondServiceInputMessage">
+            <assign to="." from="*"></assign>
+            <assign to="doc-has-headers">false</assign>
+            <assign to="status-code">400</assign>
+          </output>
+          <input message="inmsg">
+            <assign to="." from="*"></assign>
+          </input>
+        </operation>
+
+      </sequence>
+    </onFault>
+  </sequence>
+</process>
