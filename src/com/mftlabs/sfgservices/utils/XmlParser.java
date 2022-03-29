@@ -47,4 +47,26 @@ public class XmlParser {
 		result.put("adapters",adapters);
 		return result;
 	}
+	public static HashMap<String,Object> parseXmlForSchedules(String contents) throws Exception {
+		DocumentBuilderFactory factory =DocumentBuilderFactory.newInstance();
+		DocumentBuilder builder = factory.newDocumentBuilder();
+		StringBuilder xmlStringBuilder = new StringBuilder();
+		xmlStringBuilder.append(contents);
+		ByteArrayInputStream input = new ByteArrayInputStream(xmlStringBuilder.toString().getBytes("UTF-8"));
+		Document doc = builder.parse(input);
+		Element root = doc.getDocumentElement();
+		System.out.println(root.getTagName());
+		Element actionItem = (Element)root.getElementsByTagName("Action").item(0);
+		NodeList schedulesList = root.getElementsByTagName("ScheduleName");
+		System.out.println("Action: "+actionItem.getTextContent());
+		HashMap<String, Object> result = new HashMap<String,Object>();
+		result.put("action",actionItem.getTextContent());
+		ArrayList<String> schedules = new ArrayList<String>();
+		for (int i=0;i<schedulesList.getLength();i++) {
+			Element service = (Element)schedulesList.item(i);
+			schedules.add(service.getTextContent());
+		}
+		result.put("schedules",schedules);
+		return result;
+	}
 }
